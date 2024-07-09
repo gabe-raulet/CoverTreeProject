@@ -1,3 +1,5 @@
 *.dSYM
 *.swp
 *.gz
+test_itree
+test_vcell
