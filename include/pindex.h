@@ -61,7 +61,7 @@ Index PointIndex<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector& 
 
         for (Index j = 0; j < size(); ++j)
             if (distance(points[i], points[j]) <= radius)
-                neighs.push_back(j);
+                neighs.insert(j);
 
         num_edges += neighs.size();
     }
