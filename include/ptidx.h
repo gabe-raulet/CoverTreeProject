@@ -41,13 +41,14 @@ class BruteForcer : public PointIndexer<PointTraits, Index>
 {
     public:
 
-        using PointIndexer<PointTraits, Index>::size;
-        using PointIndexer<PointTraits, Index>::points;
+        using base_type = PointIndexer<PointTraits, Index>;
 
-        using Real = typename PointTraits::Real;
+        using base_type::size;
+        using base_type::points;
 
-        using IndexSet = unordered_set<Index>;
-        using IndexSetVector = vector<IndexSet>;
+        using typename base_type::Real;
+        using typename base_type::IndexSet;
+        using typename base_type::IndexSetVector;
 
         Index build_rgraph(Real radius, IndexSetVector& graph) const override;
 };
