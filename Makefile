@@ -11,10 +11,13 @@ else
 FLAGS+=-O2
 endif
 
-all: create_points
+all: create_points point_info
 test: test_itree test_vcell
 
 create_points: create_points.cpp include
+	$(CXX) -o $@ $(FLAGS) $(INCS) $<
+
+point_info: point_info.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 test_itree: tests/test_itree.cpp include
@@ -24,4 +27,4 @@ test_vcell: tests/test_vcell.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 clean:
-	rm -rf *.dSYM test_itree test_vcell create_points
+	rm -rf *.dSYM test_itree test_vcell create_points point_info
