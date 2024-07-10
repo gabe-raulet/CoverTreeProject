@@ -15,6 +15,7 @@ using PointTraits = SelectPoint<FPSIZE, PTDIM>::PointTraits;
 template <class Kind>
 using PointIndex = PointIndexer<PointTraits, Index, Kind>;
 using BruteForce = BruteForcer<PointTraits, Index>;
+using PrunedForce = PrunedForcer<PointTraits, Index>;
 
 using Real = PointTraits::Real;
 using Point = PointTraits::Point;
@@ -41,20 +42,31 @@ int main(int argc, char *argv[])
     int iters = 5;
     double damping = 0.5;
 
-    BruteForce ptidx;
+    read_options(argc, argv, fname, cutoff, iters, damping, oprefix);
+
+    BruteForce bf;
+    /* PrunedForce pf(cutoff); */
+
     PointVector points;
     vector<IndexSetVector> graphs;
 
-    read_options(argc, argv, fname, cutoff, iters, damping, oprefix);
     read_points_file(points, fname);
-    build_point_index(ptidx, points);
+
+    build_point_index(bf, points);
+    /* build_point_index(pf, points); */
+
 
     double radius = cutoff;
     for (int iter = 1; iter <= iters; ++iter)
     {
         IndexSetVector graph;
-        build_rgraph(ptidx, radius, graph, iter);
+
+        build_rgraph(bf, radius, graph, iter);
+        /* build_rgraph(pf, radius, graph, iter); */
+
         graphs.push_back(graph);
+
+
         radius *= damping;
     }
 
