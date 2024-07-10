@@ -2,7 +2,7 @@
 #include <random>
 #include <vector>
 #include <unistd.h>
-#include "pindex.h"
+#include "ptidx.h"
 #include "ptraits.h"
 #include "timer.h"
 #include "misc.h"
@@ -11,7 +11,10 @@ using namespace std;
 
 using Index = int64_t;
 using PointTraits = SelectPoint<FPSIZE, PTDIM>::PointTraits;
-using PIndex = PointIndex<PointTraits, Index>;
+
+using PointIndex = PointIndexer<PointTraits, Index>;
+using BruteForce = BruteForcer<PointTraits, Index>;
+
 using Real = PointTraits::Real;
 using Point = PointTraits::Point;
 using PointVector = vector<Point>;
@@ -19,8 +22,8 @@ using IndexSetVector = vector<unordered_set<Index>>;
 
 void read_options(int argc, char *argv[], char *&fname, double& cutoff, int& iters, double& damping, char *&oprefix);
 void read_points_file(PointVector& points, const char *fname);
-void build_point_index(PIndex& ptidx, const PointVector& points);
-void build_rgraph(PIndex& ptidx, double radius, IndexSetVector& rgraph, int iter);
+void build_point_index(PointIndex& ptidx, const PointVector& points);
+void build_rgraph(PointIndex& ptidx, double radius, IndexSetVector& rgraph, int iter);
 void write_rgraph_file(const IndexSetVector& rgraph, const char *oprefix, int iter);
 
 int main(int argc, char *argv[])
@@ -33,7 +36,7 @@ int main(int argc, char *argv[])
     int iters = 5;
     double damping = 0.5;
 
-    PIndex ptidx;
+    BruteForce ptidx;
     PointVector points;
     vector<IndexSetVector> graphs;
 
@@ -110,7 +113,7 @@ void read_points_file(PointVector& points, const char *fname)
     fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), PrettyFileSize::str(fname).c_str());
 }
 
-void build_point_index(PIndex& ptidx, const PointVector& points)
+void build_point_index(PointIndex& ptidx, const PointVector& points)
 {
     LocalTimer timer;
     timer.start_timer();
@@ -122,7 +125,7 @@ void build_point_index(PIndex& ptidx, const PointVector& points)
     fprintf(stderr, "[time=%.3f,msg::%s] :: [-]\n", timer.get_elapsed(), __func__);
 }
 
-void build_rgraph(PIndex& ptidx, double radius, IndexSetVector& rgraph, int iter)
+void build_rgraph(PointIndex& ptidx, double radius, IndexSetVector& rgraph, int iter)
 {
     LocalTimer timer;
     timer.start_timer();
