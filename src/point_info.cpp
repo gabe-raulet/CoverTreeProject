@@ -44,5 +44,6 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,dim=%d,size=%s]\n", timer.get_elapsed(), __func__, fname, n, dim, PrettyFileSize::str(fname).c_str());
 
+    main_msg(argc, argv, timer.get_elapsed());
     return 0;
 }

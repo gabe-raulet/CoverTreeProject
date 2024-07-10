@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
     timer.stop_timer();
 
+    main_msg(argc, argv, timer.get_elapsed());
     return 0;
 }
 
