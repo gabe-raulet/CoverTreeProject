@@ -82,24 +82,8 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
 
         PrunedForcer(Real cutoff) : cutoff(cutoff) {}
 
-        template <class Iter> requires is_iter_type<Iter, Point>
-        void assign(Iter first, Iter last)
-        {
-            points.assign(first, last);
-            cutoff_neighs.clear();
-
-            auto distance = PointTraits::distance();
-
-            for (Index i = 0; i < size(); ++i)
-            {
-                cutoff_neighs.emplace_back();
-                auto& es = cutoff_neighs.back();
-
-                for (Index j = 0; j < size(); ++j)
-                    if (distance(points[i], points[j]) <= cutoff)
-                        es.push_back(j);
-            }
-        }
+        template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
+        void assign(Iter first, Iter last);
 
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
 
