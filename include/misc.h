@@ -1,6 +1,7 @@
 #ifndef MISC_H_
 #define MISC_H_
 
+#include <fstream>
 #include <sstream>
 #include <stdio.h>
 
@@ -80,14 +81,19 @@ T read_integer(char *str)
 {
     double x;
     char *p;
+    char *buf;
 
-    x = strtod(str, &p);
+    buf = strdup(str);
+    x = strtod(buf, &p);
 
     if      (toupper(*p) == 'K') x *= (1LL << 10);
     else if (toupper(*p) == 'M') x *= (1LL << 20);
     else if (toupper(*p) == 'G') x *= (1LL << 30);
 
-    return static_cast<T>(x + 0.499);
+    T result =  static_cast<T>(x + 0.499);
+    free(buf);
+
+    return result;
 }
 
 #endif
