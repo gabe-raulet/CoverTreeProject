@@ -19,6 +19,7 @@ using IndexSetVector = vector<unordered_set<Index>>;
 
 void read_options(int argc, char *argv[], char *&fname, double& cutoff, int& iters, double& damping, char *&oprefix);
 void read_points_file(PointVector& points, const char *fname);
+void build_point_index(PIndex& ptidx, const PointVector& points);
 void build_rgraph(PIndex& ptidx, double radius, IndexSetVector& rgraph, int iter);
 void write_rgraph_file(const IndexSetVector& rgraph, const char *oprefix, int iter);
 
@@ -31,10 +32,27 @@ int main(int argc, char *argv[])
     double cutoff;
     int iters = 5;
     double damping = 0.5;
+
+    PIndex ptidx;
     PointVector points;
+    vector<IndexSetVector> graphs;
 
     read_options(argc, argv, fname, cutoff, iters, damping, oprefix);
     read_points_file(points, fname);
+    build_point_index(ptidx, points);
+
+    double radius = cutoff;
+    for (int iter = 1; iter <= iters; ++iter)
+    {
+        IndexSetVector graph;
+        build_rgraph(ptidx, radius, graph, iter);
+        graphs.push_back(graph);
+        radius *= damping;
+    }
+
+    if (oprefix)
+        for (int iter = 1; const auto& graph : graphs)
+            write_rgraph_file(graph, oprefix, iter++);
 
     timer.stop_timer();
     main_msg(argc, argv, timer.get_elapsed());
@@ -90,4 +108,63 @@ void read_points_file(PointVector& points, const char *fname)
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), PrettyFileSize::str(fname).c_str());
+}
+
+void build_point_index(PIndex& ptidx, const PointVector& points)
+{
+    LocalTimer timer;
+    timer.start_timer();
+
+    ptidx.assign(points.begin(), points.end());
+
+    timer.stop_timer();
+
+    fprintf(stderr, "[time=%.3f,msg::%s] :: [-]\n", timer.get_elapsed(), __func__);
+}
+
+void build_rgraph(PIndex& ptidx, double radius, IndexSetVector& rgraph, int iter)
+{
+    LocalTimer timer;
+    timer.start_timer();
+
+    Index num_edges = ptidx.build_rgraph(static_cast<Real>(radius), rgraph);
+
+    timer.stop_timer();
+
+    fprintf(stderr, "[time=%.3f,msg::%s] :: [num_verts=%lu,num_edges=%lu,avg_deg=%.3f]\n", timer.get_elapsed(), __func__, rgraph.size(), static_cast<size_t>(num_edges), (num_edges+0.0)/rgraph.size());
+}
+
+void write_rgraph_file(const IndexSetVector& rgraph, const char *oprefix, int iter)
+{
+    LocalTimer timer;
+    timer.start_timer();
+
+    stringstream ss;
+    ss << oprefix << "_" << iter << ".rgraph";
+    string fname = ss.str();
+
+    ss.clear();
+    ss.str({});
+
+    Index num_edges = 0;
+
+    for (Index u = 0; const auto& neighs : rgraph)
+    {
+        num_edges += neighs.size();
+
+        for (Index v : neighs)
+            ss << u+1 << " " << v+1 << "\n";
+    }
+
+    ofstream os;
+    os.open(fname, ios::out);
+
+    os << rgraph.size() << " " << num_edges << "\n";
+    os << ss.str();
+
+    os.close();
+
+    timer.stop_timer();
+
+    fprintf(stderr, "[time=%.3f,msg::%s] :: wrote file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname.c_str(), PrettyFileSize::str(fname.c_str()).c_str());
 }
