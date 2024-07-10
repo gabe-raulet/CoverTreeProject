@@ -20,9 +20,6 @@ class PointIndexer
         using IndexSet = unordered_set<Index>;
         using IndexSetVector = vector<IndexSet>;
 
-        PointIndexer() {}
-        PointIndexer(const PointVector& points) : points(points) {}
-
         Index size() const { return points.size(); }
 
         template <class Iter> requires is_iter_type<Iter, Point>
