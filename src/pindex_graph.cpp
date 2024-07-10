@@ -14,17 +14,20 @@ using PointTraits = SelectPoint<FPSIZE, PTDIM>::PointTraits;
 using PIndex = PointIndex<PointTraits, Index>;
 using Real = PointTraits::Real;
 using Point = PointTraits::Point;
+using PointVector = vector<Point>;
+using IndexSetVector = vector<unordered_set<Index>>;
+
+void read_options(int argc, char *argv[], char *&fname, double& cutoff, int& iters, double& damping, char *&oprefix);
+void read_points_file(PointVector& points, const char *fname);
+void build_rgraph(PIndex& ptidx, double radius, IndexSetVector& rgraph, int iter);
+void write_rgraph_file(const IndexSetVector& rgraph, const char *oprefix, int iter);
 
 int main(int argc, char *argv[])
 {
-    random_device rd;
-    default_random_engine gen{rd()};
-    normal_distribution<Real> dist{0.0, 10.0};
+    LocalTimer timer;
+    timer.start_timer();
 
-    vector<Point> points(100);
-    PointTraits::fill_random_points(points.begin(), points.end(), gen, dist);
-
-    PIndex ptidx(points);
-
+    timer.stop_timer();
+    main_msg(argc, argv, timer.get_elapsed());
     return 0;
 }
