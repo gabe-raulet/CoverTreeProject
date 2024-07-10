@@ -14,10 +14,10 @@ endif
 all: create_points point_info
 test: test_itree test_vcell
 
-create_points: create_points.cpp include
+create_points: src/create_points.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
-point_info: point_info.cpp include
+point_info: src/point_info.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 test_itree: tests/test_itree.cpp include
