@@ -6,3 +6,4 @@ test_vcell
 create_points
 point_info
 pindex_graph
+graph_diff

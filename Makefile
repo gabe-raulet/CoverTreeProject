@@ -11,13 +11,16 @@ else
 FLAGS+=-O2
 endif
 
-all: create_points point_info pindex_graph
+all: create_points point_info pindex_graph graph_diff
 test: test_itree test_vcell
 
 create_points: src/create_points.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 pindex_graph: src/pindex_graph.cpp include
+	$(CXX) -o $@ $(FLAGS) $(INCS) $<
+
+graph_diff: src/graph_diff.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 point_info: src/point_info.cpp include
@@ -30,4 +33,4 @@ test_vcell: tests/test_vcell.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 clean:
-	rm -rf *.dSYM test_itree test_vcell create_points point_info pindex_graph
+	rm -rf *.dSYM test_itree test_vcell create_points point_info pindex_graph graph_diff
