@@ -1,17 +1,13 @@
 template <class PointTraits, class Index>
 PointGenerator<PointTraits, Index>::PointGenerator()
-    : PointGenerator(-1, Comm::comm_self()) {}
+    : PointGenerator(-1) {}
 
 template <class PointTraits, class Index>
 PointGenerator<PointTraits, Index>::PointGenerator(int seed)
-    : PointGenerator(seed, Comm::comm_self()) {}
+    : seed(seed) {}
 
 template <class PointTraits, class Index>
-PointGenerator<PointTraits, Index>::PointGenerator(int seed, Comm comm)
-    : seed(seed), comm(comm) { /* TODO: distribute */ assert(comm == Comm::comm_self()); }
-
-template <class PointTraits, class Index>
-template <class Iter> requires same_as<typename Iter::value, typename PointTraits::Point>
+template <class Iter> requires same_as<typename Iter::value_type, typename PointTraits::Point>
 void PointGenerator<PointTraits, Index>::generate_local_points(Iter first, Iter last, int local_seed, double var)
 {
     random_device rd;
@@ -25,6 +21,6 @@ void PointGenerator<PointTraits, Index>::generate_points(vector<Point>& points, 
 {
     /* TODO: distribute */
     points.resize(totsize);
-    generate_local_points(points.begin(), points.end(), var);
+    generate_local_points(points.begin(), points.end(), seed, var);
 }
 
