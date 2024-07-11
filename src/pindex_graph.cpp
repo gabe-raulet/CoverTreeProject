@@ -16,6 +16,7 @@ template <class Kind>
 using PointIndex = PointIndexer<PointTraits, Index, Kind>;
 using BruteForce = BruteForcer<PointTraits, Index>;
 using PrunedForce = PrunedForcer<PointTraits, Index>;
+using TreeIndex = CoverTreeIndex<PointTraits, Index>;
 
 using Real = PointTraits::Real;
 using Point = PointTraits::Point;
@@ -45,7 +46,8 @@ int main(int argc, char *argv[])
     read_options(argc, argv, fname, cutoff, iters, damping, oprefix);
 
     BruteForce bf;
-    /* PrunedForce pf(cutoff); */
+    PrunedForce pf(cutoff);
+    TreeIndex tf(2.0);
 
     PointVector points;
     vector<IndexSetVector> graphs;
@@ -54,19 +56,19 @@ int main(int argc, char *argv[])
 
     build_point_index(bf, points);
     /* build_point_index(pf, points); */
+    /* build_point_index(tf, points); */
 
 
     double radius = cutoff;
     for (int iter = 1; iter <= iters; ++iter)
     {
-        IndexSetVector graph;
+        IndexSetVector g1, g2, g3;
 
-        build_rgraph(bf, radius, graph, iter);
-        /* build_rgraph(pf, radius, graph, iter); */
+        build_rgraph(bf, radius, g1, iter);
+        /* build_rgraph(pf, radius, g2, iter); */
+        /* build_rgraph(tf, radius, g3, iter); */
 
-        graphs.push_back(graph);
-
-
+        graphs.push_back(g1);
         radius *= damping;
     }
 

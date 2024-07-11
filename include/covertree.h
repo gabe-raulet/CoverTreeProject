@@ -3,6 +3,7 @@
 
 #include "itree.h"
 #include "vcell.h"
+#include "misc.h"
 #include <list>
 #include <tuple>
 #include <unordered_set>

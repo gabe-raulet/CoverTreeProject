@@ -96,4 +96,12 @@ T read_integer(char *str)
     return result;
 }
 
+template <class T, integral Index>
+Index iselect(const vector<T>& input, const vector<Index>& ids, vector<T>& output)
+{
+    output.resize(ids.size());
+    transform(ids.begin(), ids.end(), output.begin(), [&input](Index id) { return input[id]; });
+    return output.size();
+}
+
 #endif
