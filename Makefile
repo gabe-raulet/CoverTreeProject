@@ -11,7 +11,7 @@ else
 FLAGS+=-O2
 endif
 
-all: create_points point_info pindex_graph graph_diff
+all: create_points point_info pindex_graph graph_diff build_rgraph
 test: test_itree test_vcell test_indexers
 
 create_points: src/create_points.cpp include
@@ -26,6 +26,9 @@ graph_diff: src/graph_diff.cpp include
 point_info: src/point_info.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
+build_rgraph: src/build_rgraph.cpp include
+	$(CXX) -o $@ $(FLAGS) $(INCS) $<
+
 test_itree: tests/test_itree.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
@@ -36,4 +39,4 @@ test_indexers: tests/test_indexers.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 clean:
-	rm -rf *.dSYM test_itree test_vcell test_indexers create_points point_info pindex_graph graph_diff
+	rm -rf *.dSYM test_itree test_vcell test_indexers create_points point_info pindex_graph graph_diff build_rgraph
