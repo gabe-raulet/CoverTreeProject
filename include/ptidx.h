@@ -37,6 +37,11 @@ class PointIndexer
             return static_cast<const Kind&>(*this).build_rgraph(radius, graph);
         }
 
+        const char* repr() const
+        {
+            return static_cast<const Kind&>(*this).repr();
+        }
+
     protected:
 
         PointVector points;
@@ -57,6 +62,8 @@ class BruteForcer : public PointIndexer<PointTraits, Index, BruteForcer<PointTra
         using typename base_type::IndexSet;
         using typename base_type::IndexSetVector;
 
+        static constexpr const char* name = "brute_force";
+
         template <class Iter> requires is_iter_type<Iter, Point>
         void build(Iter first, Iter last)
         {
@@ -65,6 +72,7 @@ class BruteForcer : public PointIndexer<PointTraits, Index, BruteForcer<PointTra
 
         Index size() const { return points.size(); }
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
+        const char* repr() const { return name; }
 };
 
 template <class PointTraits, class Index>
@@ -82,6 +90,8 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
         using typename base_type::IndexSet;
         using typename base_type::IndexSetVector;
 
+        static constexpr const char* name = "prune_force";
+
         using IndexVector = vector<Index>;
         using IndexVectorVector = vector<IndexVector>;
 
@@ -92,6 +102,7 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
 
         Index size() const { return points.size(); }
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
+        const char* repr() const { return name; }
 
     private:
 
@@ -114,6 +125,8 @@ class CoverTreeIndex : public PointIndexer<PointTraits, Index, CoverTreeIndex<Po
         using typename base_type::IndexSet;
         using typename base_type::IndexSetVector;
 
+        static constexpr const char* name = "cover_tree";
+
         CoverTreeIndex(Real base) : base(base) {}
 
         template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
@@ -121,6 +134,7 @@ class CoverTreeIndex : public PointIndexer<PointTraits, Index, CoverTreeIndex<Po
 
         Index size() const { return covertree.size(); }
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
+        const char* repr() const { return name; }
 
     private:
 
