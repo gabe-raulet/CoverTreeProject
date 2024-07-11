@@ -3,6 +3,7 @@
 *.gz
 test_itree
 test_vcell
+test_indexers
 create_points
 point_info
 pindex_graph
