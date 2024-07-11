@@ -1,5 +1,5 @@
 template <class Index>
-Index GraphUtils<Index>::read_graph_file(Graph& graph, const char *fname, bool verbose = false)
+Index GraphUtils<Index>::read_graph_file(vector<IndexVector>& graph, const char *fname, bool verbose)
 {
     LocalTimer timer;
     timer.start_timer();
@@ -32,7 +32,8 @@ Index GraphUtils<Index>::read_graph_file(Graph& graph, const char *fname, bool v
 }
 
 template <class Index>
-bool GraphUtils<Index>::compare_graphs(const Graph& g1, Index m1, const Graph& g2, Index m2, bool verbose = false)
+template <class NeighborContainer>
+bool GraphUtils<Index>::compare_graphs(const vector<NeighborContainer>& g1, Index m1, const vector<NeighborContainer>& g2, Index m2, bool verbose)
 {
     LocalTimer timer;
     timer.start_timer();
@@ -47,8 +48,10 @@ bool GraphUtils<Index>::compare_graphs(const Graph& g1, Index m1, const Graph& g
         return false;
     }
 
+    auto comparator = NeighborComparator<NeighborContainer>();
+
     for (Index i = 0; i < n1; ++i)
-        if (!is_permutation(g1[i].cbegin(), g1[i].cend(), g2[i].cbegin()))
+        if (!comparator(g1[i], g2[i]))
         {
             timer.stop_timer();
             if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
@@ -58,5 +61,4 @@ bool GraphUtils<Index>::compare_graphs(const Graph& g1, Index m1, const Graph& g
     timer.stop_timer();
     if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs are identical\n", timer.get_elapsed(), __func__);
     return true;
-
 }

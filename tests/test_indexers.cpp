@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include <stdio.h>
+#include "graphutils.h"
 #include "ptgen.h"
 #include "ptraits.h"
 #include "ptidx.h"
@@ -28,7 +29,7 @@ template <class Kind>
 void build_point_index(PointIndex<Kind>& ptidx, const vector<Point>& points);
 
 template <class Kind>
-void build_rgraph(PointIndex<Kind>& ptidx, double radius, vector<unordered_set<Index>>& graph);
+Index build_rgraph(PointIndex<Kind>& ptidx, double radius, vector<unordered_set<Index>>& graph);
 
 int main(int argc, char *argv[])
 {
@@ -56,10 +57,15 @@ int main(int argc, char *argv[])
             for (Real radius : radii)
             {
                 vector<unordered_set<Index>> g1, g2, g3;
+                Index m1, m2, m3;
 
-                build_rgraph(bf, radius, g1);
-                build_rgraph(pf, radius, g2);
-                build_rgraph(ti, radius, g3);
+                m1 = build_rgraph(bf, radius, g1);
+                m2 = build_rgraph(pf, radius, g2);
+                m3 = build_rgraph(ti, radius, g3);
+
+                GraphUtils<Index>::compare_graphs(g1, m1, g2, m2, true);
+                GraphUtils<Index>::compare_graphs(g1, m1, g3, m3, true);
+                GraphUtils<Index>::compare_graphs(g2, m2, g3, m3, true);
             }
         }
 
@@ -92,7 +98,7 @@ void build_point_index(PointIndex<Kind>& ptidx, const vector<Point>& points)
 }
 
 template <class Kind>
-void build_rgraph(PointIndex<Kind>& ptidx, double radius, vector<unordered_set<Index>>& graph)
+Index build_rgraph(PointIndex<Kind>& ptidx, double radius, vector<unordered_set<Index>>& graph)
 {
     LocalTimer timer;
     timer.start_timer();
@@ -102,4 +108,5 @@ void build_rgraph(PointIndex<Kind>& ptidx, double radius, vector<unordered_set<I
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: built r-graph with r=%.3f [num_verts=%lu,num_edges=%lu,avg_deg=%.3f]\n", timer.get_elapsed(), __func__, radius, graph.size(), static_cast<size_t>(num_edges), (num_edges+0.0)/graph.size());
+    return num_edges;
 }
