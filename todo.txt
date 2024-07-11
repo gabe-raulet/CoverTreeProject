@@ -1,0 +1,12 @@
+
+1. implement distributed itree with one layer of replication
+
+2. reintegrate distributed cover tree (data parallel version) into this repo using
+   the new PointIndexer setup and distributed itree.
+
+3. implement distributed cover tree (task parallel version) incorporating load balancing
+   strategies based on different functors (as seen in ElegantTree repo).
+
+4. implement distributed cover tree with lazy construction of non-replicated sub-trees
+   based upon an input threshold which can be used to build so-called "ghost sub-trees"
+   on each local processor.
