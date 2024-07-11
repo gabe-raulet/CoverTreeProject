@@ -3,6 +3,7 @@
 
 using namespace std;
 
+#include "covertree.h"
 #include <unordered_set>
 
 template <class Iter, class T>
@@ -20,7 +21,10 @@ class PointIndexer
         using IndexSet = unordered_set<Index>;
         using IndexSetVector = vector<IndexSet>;
 
-        Index size() const { return points.size(); }
+        Index size() const
+        {
+            return static_cast<const Kind&>(*this).size();
+        }
 
         template <class Iter> requires is_iter_type<Iter, Point>
         void build(Iter first, Iter last)
@@ -59,6 +63,7 @@ class BruteForcer : public PointIndexer<PointTraits, Index, BruteForcer<PointTra
             points.assign(first, last);
         }
 
+        Index size() const { return points.size(); }
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
 };
 
@@ -85,12 +90,42 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
         template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
         void build(Iter first, Iter last);
 
+        Index size() const { return points.size(); }
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
 
     private:
 
         Real cutoff;
         IndexVectorVector cutoff_neighs;
+};
+
+template <class PointTraits, class Index>
+class CoverTreeIndex : public PointIndexer<PointTraits, Index, CoverTreeIndex<PointTraits, Index>>
+{
+    public:
+
+        using base_type = PointIndexer<PointTraits, Index, CoverTreeIndex>;
+
+        using base_type::size;
+        using base_type::points;
+
+        using typename base_type::Real;
+        using typename base_type::Point;
+        using typename base_type::IndexSet;
+        using typename base_type::IndexSetVector;
+
+        CoverTreeIndex(Real base) : base(base) {}
+
+        template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
+        void build(Iter first, Iter last);
+
+        Index size() const { return covertree.size(); }
+        Index build_rgraph(Real radius, IndexSetVector& graph) const;
+
+    private:
+
+        Real base;
+        CoverTree<PointTraits, Index> covertree;
 };
 
 #include "ptidx.hpp"

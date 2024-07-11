@@ -1,5 +1,5 @@
-#ifndef COVER_TREE_INDEX_H_
-#define COVER_TREE_INDEX_H_
+#ifndef COVER_TREE_H_
+#define COVER_TREE_H_
 
 #include "itree.h"
 #include "vcell.h"
@@ -10,7 +10,7 @@
 using namespace std;
 
 template <class PointTraits, class Index>
-class TreeIndex
+class CoverTree
 {
     public:
 
@@ -27,13 +27,13 @@ class TreeIndex
         using IndexSet = unordered_set<Index>;
         using IndexSetVector = vector<IndexSet>;
 
-        TreeIndex(const PointVector& points, Real base);
+        template <class Iter>
+        void build(Iter first, Iter last, Real base);
 
-        Index build_rgraph(Real radius, IndexSetVector& rgraph) const;
         Index radii_query(const Point& query, Real radius, IndexSet& ids) const;
+        Index radii_query(const Index& query, Real radius, IndexSet& ids) const { return radii_query(points[query], radius, ids); }
 
         Index size() const { return points.size(); }
-
         Real get_max_radius() const { return max_radius; }
 
     private:
@@ -47,6 +47,6 @@ class TreeIndex
         Real level_radius(Index level) const { return ::pow(base, -1. * level); }
 };
 
-#include "treeindex.hpp"
+#include "covertree.hpp"
 
 #endif

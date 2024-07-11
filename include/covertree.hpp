@@ -1,27 +1,14 @@
 template <class PointTraits, class Index>
-TreeIndex<PointTraits, Index>::TreeIndex(const PointVector& points, Real base)
-    : base(base), points(points) { init(); }
-
-template <class PointTraits, class Index>
-Index TreeIndex<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector& rgraph) const
+template <class Iter>
+void CoverTree<PointTraits, Index>::build(Iter first, Iter last, Real _base)
 {
-    auto distance = PointTraits::distance();
-
-    Index n_edges = 0;
-    rgraph.clear(); rgraph.reserve(size());
-
-    for (Point p : points)
-    {
-        rgraph.emplace_back();
-        radii_query(p, radius, rgraph.back());
-        n_edges += rgraph.back().size();
-    }
-
-    return n_edges;
+    base = _base;
+    points.assign(first, last);
+    init();
 }
 
 template <class PointTraits, class Index>
-Index TreeIndex<PointTraits, Index>::radii_query(const Point& query, Real radius, IndexSet& ids) const
+Index CoverTree<PointTraits, Index>::radii_query(const Point& query, Real radius, IndexSet& ids) const
 {
     ids.clear();
     IndexVector stack = {0}, children;
@@ -45,7 +32,7 @@ Index TreeIndex<PointTraits, Index>::radii_query(const Point& query, Real radius
 }
 
 template <class PointTraits, class Index>
-void TreeIndex<PointTraits, Index>::init()
+void CoverTree<PointTraits, Index>::init()
 {
     using TaskQueue = list<tuple<Index, IndexVector>>; /* tuple = (tree vertex id, cell point ids) */
 

@@ -64,3 +64,26 @@ Index PrunedForcer<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector
 
     return num_edges;
 }
+
+template <class PointTraits, class Index>
+template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
+void CoverTreeIndex<PointTraits, Index>::build(Iter first, Iter last)
+{
+    covertree.build(first, last, base);
+}
+
+template <class PointTraits, class Index>
+Index CoverTreeIndex<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector& graph) const
+{
+    graph.clear();
+    Index num_edges = 0;
+
+    for (Index i = 0; i < size(); ++i)
+    {
+        graph.emplace_back();
+        auto& neighs = graph.back();
+        num_edges += covertree.radii_query(i, radius, neighs);
+    }
+
+    return num_edges;
+}
