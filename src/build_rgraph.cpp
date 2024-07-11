@@ -18,12 +18,11 @@ using TreeIndex = CoverTreeIndex<PointTraits, Index>;
 
 using Real = PointTraits::Real;
 using Point = PointTraits::Point;
-using PointVector = vector<Point>;
-using IndexSetVector = vector<unordered_set<Index>>;
 
 enum Indexer {BruteOpt, TreeOpt};
 
 void read_options(int argc, char *argv[], char *&infname, char *&outfname, double& radius, Indexer& indexer);
+void read_points_file(vector<Point>& points, const char *fname);
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +33,10 @@ int main(int argc, char *argv[])
     LocalTimer timer;
     timer.start_timer();
 
+    vector<Point> points;
+
     read_options(argc, argv, infname, outfname, radius, indexer);
+    read_points_file(points, infname);
 
     timer.stop_timer();
     main_msg(argc, argv, timer.get_elapsed());
@@ -77,4 +79,17 @@ void read_options(int argc, char *argv[], char *&infname, char *&outfname, doubl
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: [ptsfname='%s',graphfname='%s',radius=%.2f,indexer=%s]\n", timer.get_elapsed(), __func__, infname, outfname, radius, indexer == BruteOpt? "brute_force" : "cover_tree");
+}
+
+void read_points_file(vector<Point>& points, const char *fname)
+{
+    LocalTimer timer;
+    timer.start_timer();
+
+    points.clear();
+    PointTraits::read_from_file(back_inserter(points), fname);
+
+    timer.stop_timer();
+
+    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), PrettyFileSize::str(fname).c_str());
 }
