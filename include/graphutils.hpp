@@ -1,3 +1,37 @@
+
+template <class Index>
+template <class NeighborContainer>
+void GraphUtils<Index>::write_graph_file(const vector<NeighborContainer>& graph, const char *fname, bool verbose)
+{
+    LocalTimer timer;
+    timer.start_timer();
+
+    stringstream ss;
+
+    Index num_edges = 0;
+
+    for (Index u = 0; const auto& neighs : graph)
+    {
+        num_edges += neighs.size();
+
+        for (Index v : neighs)
+            ss << u+1 << " " << v+1 << "\n";
+
+        u++;
+    }
+
+    ofstream os;
+    os.open(fname, ios::out);
+
+    os << graph.size() << " " << num_edges << "\n";
+    os << ss.str();
+    os.close();
+
+    timer.stop_timer();
+
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: wrote file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname, PrettyFileSize::str(fname).c_str());
+}
+
 template <class Index>
 Index GraphUtils<Index>::read_graph_file(vector<IndexVector>& graph, const char *fname, bool verbose)
 {

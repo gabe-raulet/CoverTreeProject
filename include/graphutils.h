@@ -36,7 +36,11 @@ struct GraphUtils
     static Index read_graph_file(vector<IndexVector>& graph, const char *fname, bool verbose = false);
 
     template <class NeighborContainer>
+    static void write_graph_file(const vector<NeighborContainer>& graph, const char *fname, bool verbose = false);
+
+    template <class NeighborContainer>
     static bool compare_graphs(const vector<NeighborContainer>& g1, Index m1, const vector<NeighborContainer>& g2, Index m2, bool verbose = false);
+
 
 };
 
