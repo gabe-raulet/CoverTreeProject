@@ -23,9 +23,9 @@ class PointIndexer
         Index size() const { return points.size(); }
 
         template <class Iter> requires is_iter_type<Iter, Point>
-        void assign(Iter first, Iter last)
+        void build(Iter first, Iter last)
         {
-            static_cast<Kind&>(*this).assign(first, last);
+            static_cast<Kind&>(*this).build(first, last);
         }
 
         Index build_rgraph(Real radius, IndexSetVector& graph) const
@@ -54,7 +54,7 @@ class BruteForcer : public PointIndexer<PointTraits, Index, BruteForcer<PointTra
         using typename base_type::IndexSetVector;
 
         template <class Iter> requires is_iter_type<Iter, Point>
-        void assign(Iter first, Iter last)
+        void build(Iter first, Iter last)
         {
             points.assign(first, last);
         }
@@ -83,7 +83,7 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
         PrunedForcer(Real cutoff) : cutoff(cutoff) {}
 
         template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
-        void assign(Iter first, Iter last);
+        void build(Iter first, Iter last);
 
         Index build_rgraph(Real radius, IndexSetVector& graph) const;
 

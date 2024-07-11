@@ -37,7 +37,7 @@ Index BruteForcer<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector&
 
 template <class PointTraits, class Index>
 template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
-void PrunedForcer<PointTraits, Index>::assign(Iter first, Iter last)
+void PrunedForcer<PointTraits, Index>::build(Iter first, Iter last)
 {
     points.assign(first, last);
     GraphInserter<PointTraits, Index>()(points, cutoff, cutoff_neighs);

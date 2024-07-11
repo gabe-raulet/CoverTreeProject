@@ -136,7 +136,7 @@ void build_point_index(PointIndex<Kind>& ptidx, const PointVector& points)
     LocalTimer timer;
     timer.start_timer();
 
-    ptidx.assign(points.begin(), points.end());
+    ptidx.build(points.begin(), points.end());
 
     timer.stop_timer();
 
