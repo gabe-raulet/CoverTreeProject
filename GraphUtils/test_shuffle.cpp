@@ -25,5 +25,15 @@ int main(int argc, char *argv[])
     GraphUtils::write_graph_file(A, "A.txt");
     GraphUtils::write_graph_file(B, "B.txt");
 
+    Graph AA, BB;
+
+    GraphUtils::read_graph_file(AA, "A.txt");
+    GraphUtils::read_graph_file(BB, "B.txt");
+
+    GraphUtils::shuffle_vector_graph(AA);
+    GraphUtils::shuffle_vector_graph(BB);
+
+    assert((GraphUtils::compare_graphs(AA, BB)));
+
     return 0;
 }
