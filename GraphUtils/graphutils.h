@@ -43,6 +43,11 @@ struct GraphUtils
 
     template <class Graph, class Real, class RandomGen>
     static Index erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen);
+
+    static void shuffle_vector_graph(VecGraph& g, int seed = -1);
+
+    template <class RandomGen>
+    static void shuffle_vector_graph(VecGraph& g, RandomGen& gen);
 };
 
 #include "graphutils.hpp"

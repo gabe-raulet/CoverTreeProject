@@ -8,10 +8,15 @@ else
 FLAGS+=-O2
 endif
 
-all: main
+FILES=graphutils.h graphutils.hpp fileinfo.h
 
-main: main.cpp graphutils.h graphutils.hpp fileinfo.h
+all: main test_shuffle
+
+main: main.cpp $(FILES)
+	$(CXX) -o $@ $(FLAGS) $<
+
+test_shuffle: test_shuffle.cpp $(FILES)
 	$(CXX) -o $@ $(FLAGS) $<
 
 clean:
-	rm -rf *.dSYM main
+	rm -rf *.{dSYM,txt} main test_shuffle

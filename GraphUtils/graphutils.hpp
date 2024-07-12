@@ -139,3 +139,18 @@ Index GraphUtils<Index>::erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen)
 
     return m;
 }
+
+template <class Index>
+void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, int seed)
+{
+    random_device rd;
+    default_random_engine gen(seed < 0? rd() : seed*17);
+    shuffle_vector_graph(g, gen);
+}
+
+template <class Index>
+template <class RandomGen>
+void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, RandomGen& gen)
+{
+    for (auto& es : g) shuffle(es.begin(), es.end(), gen);
+}
