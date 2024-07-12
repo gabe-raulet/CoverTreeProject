@@ -10,12 +10,15 @@ endif
 
 FILES=graphutils.h graphutils.hpp fileinfo.h
 
-all: main test_shuffle graph_diff erdos_renyi
+all: main test_shuffle test_graphutils graph_diff erdos_renyi
 
 main: main.cpp $(FILES)
 	$(CXX) -o $@ $(FLAGS) $<
 
 test_shuffle: test_shuffle.cpp $(FILES)
+	$(CXX) -o $@ $(FLAGS) $<
+
+test_graphutils: test_graphutils.cpp $(FILES)
 	$(CXX) -o $@ $(FLAGS) $<
 
 graph_diff: graph_diff.cpp $(FILES)
@@ -26,4 +29,4 @@ erdos_renyi: erdos_renyi.cpp $(FILES)
 
 
 clean:
-	rm -rf *.{dSYM,txt} main test_shuffle graph_diff erdos_renyi
+	rm -rf *.{dSYM,txt} main test_shuffle test_graphutils graph_diff erdos_renyi
