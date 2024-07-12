@@ -35,8 +35,8 @@ struct GraphUtils
     template <class Graph>
     static void write_graph_file(const Graph& g, const char *fname, bool verbose = true);
 
-    template <class Graph>
-    static bool compare_graphs(const Graph& g1, const Graph& g2, bool verbose = true);
+    template <class Graph1, class Graph2>
+    static bool compare_graphs(const Graph1& g1, const Graph2& g2, bool verbose = true);
 
     template <class Graph, class Real>
     static Index erdos_renyi(Graph& g, Index n, Real p, int seed = -1);
@@ -44,10 +44,10 @@ struct GraphUtils
     template <class Graph, class Real, class RandomGen>
     static Index erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen);
 
-    static void shuffle_vector_graph(VecGraph& g, int seed = -1);
+    static void shuffle_vector_graph(VecGraph& g, int seed = -1, bool verbose = true);
 
     template <class RandomGen>
-    static void shuffle_vector_graph(VecGraph& g, RandomGen& gen);
+    static void shuffle_vector_graph(VecGraph& g, RandomGen& gen, bool verbose = true);
 };
 
 #include "graphutils.hpp"

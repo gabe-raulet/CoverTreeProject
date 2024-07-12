@@ -43,6 +43,8 @@ Index GraphUtils<Index>::read_graph_file(Graph& g, const char *fname, bool verbo
     is.close();
     timer.stop_timer();
 
+    m = num_edges(g);
+
     if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] read file '%s' [num_verts=%lu,num_edges=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, (size_t)n, (size_t)m, FileInfo(fname).get_file_size_str());
 
     return m;
@@ -78,31 +80,80 @@ void GraphUtils<Index>::write_graph_file(const Graph& g, const char *fname, bool
 }
 
 template <class Index>
-template <class Graph>
-bool GraphUtils<Index>::compare_graphs(const Graph& g1, const Graph& g2, bool verbose)
+template <class Graph1, class Graph2>
+bool GraphUtils<Index>::compare_graphs(const Graph1& g1, const Graph2& g2, bool verbose)
 {
     LocalTimer timer;
     timer.start_timer();
 
-    if (g1.size() != g2.size())
+    size_t n1, n2, m1, m2;
+
+    n1 = g1.size();
+    n2 = g2.size();
+
+    if (n1 != n2)
     {
         timer.stop_timer();
-        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
+        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [n1=%lu,n2=%lu]\n", timer.get_elapsed(), __func__, n1, n2);
         return false;
     }
 
-    for (Index i = 0; i < g1.size(); ++i)
-        if (g1[i] != g2[i])
+    m1 = num_edges(g1);
+    m2 = num_edges(g2);
+
+    if (m1 != m2)
+    {
+        timer.stop_timer();
+        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [m1=%lu,m2=%lu]\n", timer.get_elapsed(), __func__, m1, m2);
+        return false;
+    }
+
+    for (Index i = 0; i < n1; ++i)
+    {
+        IndexSet es1(g1[i].begin(), g1[i].end());
+        IndexSet es2(g2[i].begin(), g2[i].end());
+
+        if (es1 != es2)
         {
             timer.stop_timer();
-            if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
+            if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [g1[%lu]!=g2[%lu]]\n", timer.get_elapsed(), __func__, (size_t)i, (size_t)i);
             return false;
         }
+    }
 
     timer.stop_timer();
-    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs are identical\n", timer.get_elapsed(), __func__);
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs identical\n", timer.get_elapsed(), __func__);
     return true;
 }
+
+/*
+ * template <class Index>
+ * template <class Graph>
+ * bool GraphUtils<Index>::compare_graphs(const Graph& g1, const Graph& g2, bool verbose)
+ * {
+ *     LocalTimer timer;
+ *     timer.start_timer();
+ *
+ *     if (g1.size() != g2.size())
+ *     {
+ *         timer.stop_timer();
+ *         if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
+ *         return false;
+ *     }
+ *
+ *     for (Index i = 0; i < g1.size(); ++i)
+ *         if (g1[i] != g2[i])
+ *         {
+ *             timer.stop_timer();
+ *             if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
+ *             return false;
+ *         }
+ *
+ *     timer.stop_timer();
+ *     if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs are identical\n", timer.get_elapsed(), __func__);
+ *     return true;
+ * }
+ */
 
 template <class Index>
 template <class Graph, class Real>
@@ -141,16 +192,22 @@ Index GraphUtils<Index>::erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen)
 }
 
 template <class Index>
-void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, int seed)
+void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, int seed, bool verbose)
 {
     random_device rd;
     default_random_engine gen(seed < 0? rd() : seed*17);
-    shuffle_vector_graph(g, gen);
+    shuffle_vector_graph(g, gen, verbose);
 }
 
 template <class Index>
 template <class RandomGen>
-void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, RandomGen& gen)
+void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, RandomGen& gen, bool verbose)
 {
+    LocalTimer timer;
+
+    timer.start_timer();
     for (auto& es : g) shuffle(es.begin(), es.end(), gen);
+    timer.stop_timer();
+
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: shuffled graph\n", timer.get_elapsed(), __func__);
 }
