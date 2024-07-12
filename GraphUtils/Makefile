@@ -10,7 +10,7 @@ endif
 
 all: main
 
-main: main.cpp graphutils.h
+main: main.cpp graphutils.h graphutils.hpp fileinfo.h
 	$(CXX) -o $@ $(FLAGS) $<
 
 clean:

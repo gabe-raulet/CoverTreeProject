@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
     GraphUtils::VecGraph g1;
     GraphUtils::SetGraph g2;
 
-    GraphUtils::erdos_renyi(g1, 20, 0.25, 5);
-    GraphUtils::erdos_renyi(g2, 20, 0.25, 5);
+    GraphUtils::erdos_renyi(g1, 2000, 0.05, 5);
+    GraphUtils::erdos_renyi(g2, 2000, 0.05, 5);
 
     GraphUtils::write_graph_file(g1, "A.txt");
     GraphUtils::write_graph_file(g2, "B.txt");
