@@ -123,35 +123,6 @@ bool GraphUtils<Index>::compare_graphs(const Graph1& g1, const Graph2& g2, bool 
     return true;
 }
 
-/*
- * template <class Index>
- * template <class Graph>
- * bool GraphUtils<Index>::compare_graphs(const Graph& g1, const Graph& g2, bool verbose)
- * {
- *     LocalTimer timer;
- *     timer.start_timer();
- *
- *     if (g1.size() != g2.size())
- *     {
- *         timer.stop_timer();
- *         if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
- *         return false;
- *     }
- *
- *     for (Index i = 0; i < g1.size(); ++i)
- *         if (g1[i] != g2[i])
- *         {
- *             timer.stop_timer();
- *             if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ\n", timer.get_elapsed(), __func__);
- *             return false;
- *         }
- *
- *     timer.stop_timer();
- *     if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs are identical\n", timer.get_elapsed(), __func__);
- *     return true;
- * }
- */
-
 template <class Index>
 template <class Graph, class Real>
 Index GraphUtils<Index>::erdos_renyi(Graph& g, Index n, Real p, int seed)
