@@ -11,7 +11,7 @@ else
 FLAGS+=-O2
 endif
 
-all: create_points point_info pindex_graph graph_diff build_rgraph
+all: create_points point_info pindex_graph graph_diff build_rgraph erdos_renyi
 test: test_itree test_vcell test_indexers test_graphutils
 
 create_points: src/create_points.cpp include
@@ -29,6 +29,9 @@ point_info: src/point_info.cpp include
 build_rgraph: src/build_rgraph.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
+erdos_renyi: src/erdos_renyi.cpp include
+	$(CXX) -o $@ $(FLAGS) $(INCS) $<
+
 test_itree: tests/test_itree.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
@@ -42,4 +45,4 @@ test_graphutils: tests/test_graphutils.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 clean:
-	rm -rf *.dSYM test_itree test_vcell test_indexers test_graphutils create_points point_info pindex_graph graph_diff build_rgraph
+	rm -rf *.dSYM test_itree test_vcell test_indexers test_graphutils create_points point_info pindex_graph graph_diff build_rgraph erdos_renyi
