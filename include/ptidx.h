@@ -52,6 +52,8 @@ class BruteForcer : public PointIndexer<PointTraits, Index, BruteForcer<PointTra
 {
     public:
 
+        static constexpr const char* name = "brute_force";
+
         using base_type = PointIndexer<PointTraits, Index, BruteForcer>;
 
         using base_type::size;
@@ -61,8 +63,6 @@ class BruteForcer : public PointIndexer<PointTraits, Index, BruteForcer<PointTra
         using typename base_type::Point;
         using typename base_type::IndexSet;
         using typename base_type::IndexSetVector;
-
-        static constexpr const char* name = "brute_force";
 
         template <class Iter> requires is_iter_type<Iter, Point>
         void build(Iter first, Iter last)
@@ -80,6 +80,8 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
 {
     public:
 
+        static constexpr const char* name = "prune_force";
+
         using base_type = PointIndexer<PointTraits, Index, PrunedForcer>;
 
         using base_type::size;
@@ -89,8 +91,6 @@ class PrunedForcer : public PointIndexer<PointTraits, Index, PrunedForcer<PointT
         using typename base_type::Point;
         using typename base_type::IndexSet;
         using typename base_type::IndexSetVector;
-
-        static constexpr const char* name = "prune_force";
 
         using IndexVector = vector<Index>;
         using IndexVectorVector = vector<IndexVector>;
@@ -115,6 +115,8 @@ class CoverTreeIndex : public PointIndexer<PointTraits, Index, CoverTreeIndex<Po
 {
     public:
 
+        static constexpr const char* name = "cover_tree";
+
         using base_type = PointIndexer<PointTraits, Index, CoverTreeIndex>;
 
         using base_type::size;
@@ -124,8 +126,6 @@ class CoverTreeIndex : public PointIndexer<PointTraits, Index, CoverTreeIndex<Po
         using typename base_type::Point;
         using typename base_type::IndexSet;
         using typename base_type::IndexSetVector;
-
-        static constexpr const char* name = "cover_tree";
 
         CoverTreeIndex(Real base) : base(base) {}
 
