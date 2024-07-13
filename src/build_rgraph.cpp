@@ -3,8 +3,9 @@
 #include <vector>
 #include <unistd.h>
 #include "ptidx.h"
-#include "graphutils.h"
 #include "ptraits.h"
+#include "ptutils.h"
+#include "graphutils.h"
 #include "timer.h"
 #include "misc.h"
 
@@ -24,7 +25,6 @@ using Graph = vector<unordered_set<Index>>;
 enum Indexer {BruteOpt, TreeOpt};
 
 void read_options(int argc, char *argv[], char *&infname, char *&outfname, double& radius, double& base, Indexer& indexer);
-void read_points_file(vector<Point>& points, const char *fname);
 void write_graph_file(const Graph& graph, const char *fname);
 
 template <class Kind>
@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
     vector<Point> points;
 
     read_options(argc, argv, infname, outfname, radius, base, indexer);
-    read_points_file(points, infname);
+
+    PointUtils<PointTraits, Index>::read_points_file(points, infname);
 
     BruteForce bf;
     TreeIndex ti(base);
@@ -103,19 +104,6 @@ void read_options(int argc, char *argv[], char *&infname, char *&outfname, doubl
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: [ptsfname='%s',graphfname='%s',radius=%.2f,indexer=%s]\n", timer.get_elapsed(), __func__, infname, outfname, radius, indexer == BruteOpt? "brute_force" : "cover_tree");
-}
-
-void read_points_file(vector<Point>& points, const char *fname)
-{
-    LocalTimer timer;
-    timer.start_timer();
-
-    points.clear();
-    PointTraits::read_from_file(back_inserter(points), fname);
-
-    timer.stop_timer();
-
-    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), FileInfo(fname).get_file_size_str());
 }
 
 template <class Kind>

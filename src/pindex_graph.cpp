@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "ptidx.h"
 #include "ptraits.h"
+#include "ptutils.h"
 #include "timer.h"
 #include "misc.h"
 
@@ -24,7 +25,6 @@ using PointVector = vector<Point>;
 using IndexSetVector = vector<unordered_set<Index>>;
 
 void read_options(int argc, char *argv[], char *&fname, double& cutoff, int& iters, double& damping, char *&oprefix);
-void read_points_file(PointVector& points, const char *fname);
 void write_rgraph_file(const IndexSetVector& rgraph, const char *oprefix, int iter);
 
 template <class Kind>
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     PointVector points;
     vector<IndexSetVector> graphs;
 
-    read_points_file(points, fname);
+    PointUtils<PointTraits, Index>::read_points_file(points, fname);
 
     build_point_index(bf, points);
     /* build_point_index(pf, points); */
@@ -117,19 +117,6 @@ void read_options(int argc, char *argv[], char *&fname, double& cutoff, int& ite
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: [fname='%s',cutoff=%.2f,iters=%d,damping=%.2f,oprefix='%s']\n", timer.get_elapsed(), __func__, fname, cutoff, iters, damping, oprefix);
-}
-
-void read_points_file(PointVector& points, const char *fname)
-{
-    LocalTimer timer;
-    timer.start_timer();
-
-    points.clear();
-    PointTraits::read_from_file(back_inserter(points), fname);
-
-    timer.stop_timer();
-
-    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), FileInfo(fname).get_file_size_str());
 }
 
 template <class Kind>
