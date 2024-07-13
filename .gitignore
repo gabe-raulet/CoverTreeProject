@@ -4,6 +4,7 @@
 test_itree
 test_vcell
 test_indexers
+test_graphutils
 create_points
 point_info
 pindex_graph

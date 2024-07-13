@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
     timer.stop_timer();
 
-    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,dim=%d,size=%s]\n", timer.get_elapsed(), __func__, fname, n, dim, PrettyFileSize::str(fname).c_str());
+    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,dim=%d,size=%s]\n", timer.get_elapsed(), __func__, fname, n, dim, FileInfo(fname).get_file_size_str());
 
     main_msg(argc, argv, timer.get_elapsed());
     return 0;

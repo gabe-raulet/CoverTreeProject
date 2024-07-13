@@ -115,7 +115,7 @@ void read_points_file(vector<Point>& points, const char *fname)
 
     timer.stop_timer();
 
-    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), PrettyFileSize::str(fname).c_str());
+    fprintf(stderr, "[time=%.3f,msg::%s] read points file '%s' [numpts=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, static_cast<size_t>(points.size()), FileInfo(fname).get_file_size_str());
 }
 
 template <class Kind>

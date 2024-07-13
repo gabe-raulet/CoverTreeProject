@@ -1,15 +1,16 @@
 #include <vector>
 #include <stdio.h>
 #include "graphutils.h"
+#include "timer.h"
 
 using namespace std;
 
-using Index = int64_t;
-using IndexVector = vector<Index>;
-using Graph = vector<IndexVector>;
-
 int main(int argc, char *argv[])
 {
+    using Index = int64_t;
+    using GraphUtils = GraphUtils<Index>;
+    using Graph = GraphUtils::VecGraph;
+
     LocalTimer timer;
     timer.start_timer();
 
@@ -19,16 +20,18 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    Graph graph1, graph2;
-    Index m1, m2;
+    Graph g1, g2;
 
-    m1 = GraphUtils<Index>::read_graph_file(graph1, argv[1], true);
-    m2 = GraphUtils<Index>::read_graph_file(graph2, argv[2], true);
+    GraphUtils::read_graph_file(g1, argv[1]);
+    GraphUtils::read_graph_file(g2, argv[2]);
 
-    GraphUtils<Index>::compare_graphs(graph1, m1, graph2, m2, true);
+    GraphUtils::compare_graphs(g1, g2);
 
     timer.stop_timer();
 
-    main_msg(argc, argv, timer.get_elapsed());
+    fprintf(stderr, "[time=%.3f,msg::%s] command:", timer.get_elapsed(), __func__);
+    for (int i = 0; i < argc; ++i) fprintf(stderr, " %s", argv[i]);
+    fprintf(stderr, "\n");
+
     return 0;
 }

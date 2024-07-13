@@ -70,7 +70,7 @@ void Traits<R, D>::read_from_file(Iter d_first, const char *fname)
     PointRecord record;
     size_t filesize, n;
 
-    filesize = get_file_size(fname);
+    filesize = FileInfo(fname).get_file_size();
     is.open(fname, ios::binary | ios::in);
 
     assert(filesize % sizeof(record) == 0);

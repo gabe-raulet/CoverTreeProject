@@ -5,6 +5,7 @@
 #include <sstream>
 #include <assert.h>
 #include "misc.h"
+#include "fileinfo.h"
 
 using namespace std;
 

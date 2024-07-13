@@ -97,5 +97,5 @@ void write_points_file(const vector<Point>& points, const char *fname)
 
     timer.stop_timer();
 
-    fprintf(stderr, "[time=%.3f,msg::%s] :: wrote points to file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname, PrettyFileSize::str(fname).c_str());
+    fprintf(stderr, "[time=%.3f,msg::%s] :: wrote points to file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname, FileInfo(fname).get_file_size_str());
 }

@@ -7,44 +7,6 @@
 
 using namespace std;
 
-size_t get_file_size(const char *fname)
-{
-    ifstream is;
-    size_t fsize;
-
-    is.open(fname, ios::binary | ios::in);
-    is.seekg(0, is.end);
-    fsize = is.tellg();
-    is.seekg(0, is.beg);
-
-    is.close();
-    return fsize;
-}
-
-struct PrettyFileSize
-{
-    uintmax_t size;
-
-    PrettyFileSize(const char *fname) : size(get_file_size(fname)) {}
-
-    static string str(const char *fname)
-    {
-        stringstream ss;
-        ss << PrettyFileSize(fname);
-        return ss.str();
-    }
-
-    template <class c, class t>
-    friend basic_ostream<c,t>& operator<<(basic_ostream<c,t>& os, PrettyFileSize hr)
-    {
-        int i{};
-        double mantissa = hr.size;
-        for (; mantissa >= 1024.0; mantissa /= 1024.0, ++i);
-        os << ceil(mantissa * 10.) / 10. << i["BKMGTPE"];
-        return i? os << "B" : os;
-    }
-};
-
 void main_msg(int argc, char *argv[], double elapsed)
 {
     fprintf(stderr, "[time=%.3f,msg::main] command:", elapsed);

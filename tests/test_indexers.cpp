@@ -63,9 +63,9 @@ int main(int argc, char *argv[])
                 m2 = build_rgraph(pf, radius, g2);
                 m3 = build_rgraph(ti, radius, g3);
 
-                GraphUtils<Index>::compare_graphs(g1, m1, g2, m2, true);
-                GraphUtils<Index>::compare_graphs(g1, m1, g3, m3, true);
-                GraphUtils<Index>::compare_graphs(g2, m2, g3, m3, true);
+                GraphUtils<Index>::compare_graphs(g1, g2, true);
+                GraphUtils<Index>::compare_graphs(g1, g3, true);
+                GraphUtils<Index>::compare_graphs(g2, g3, true);
             }
         }
 
