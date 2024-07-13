@@ -108,18 +108,15 @@ bool GraphUtils<Index>::compare_graphs(const Graph1& g1, const Graph2& g2, bool 
         return false;
     }
 
-    for (Index i = 0; i < n1; ++i)
-    {
-        IndexSet es1(g1[i].begin(), g1[i].end());
-        IndexSet es2(g2[i].begin(), g2[i].end());
+    auto comp = CompareEdgeSet<Index>();
 
-        if (es1 != es2)
+    for (Index i = 0; i < n1; ++i)
+        if (!comp(g1[i], g2[i]))
         {
             timer.stop_timer();
-            if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [g1[%lu]!=g2[%lu]]\n", timer.get_elapsed(), __func__, (size_t)i, (size_t)i);
+            if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [g1[%lu]!=g2[%lu]]\n", timer.get_elapsed(), __func__, (size_t)(i+1), (size_t)(i+1));
             return false;
         }
-    }
 
     timer.stop_timer();
     if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs identical\n", timer.get_elapsed(), __func__);

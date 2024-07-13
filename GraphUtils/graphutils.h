@@ -1,6 +1,7 @@
 #ifndef GRAPH_UTILS_H_
 #define GRAPH_UTILS_H_
 
+#include <iostream>
 #include <vector>
 #include <random>
 #include <unordered_set>
@@ -48,7 +49,39 @@ struct GraphUtils
 
     template <class RandomGen>
     static void shuffle_vector_graph(VecGraph& g, RandomGen& gen, bool verbose = true);
+
 };
+
+template <class Index>
+struct CompareEdgeSet
+{
+    using V = typename GraphUtils<Index>::IndexVec;
+    using S = typename GraphUtils<Index>::IndexSet;
+
+    template <class C1, class C2>
+    bool operator()(const C1& lhs, const C2& rhs);
+
+    template <>
+    bool operator()(const V& lhs, const V& rhs) { return is_permutation(lhs.cbegin(), lhs.cend(), rhs.cbegin()); }
+
+    template <>
+    bool operator()(const S& lhs, const S& rhs) { return (lhs == rhs); }
+
+    template <>
+    bool operator()(const S& lhs, const V& rhs)
+    {
+        V lhs_v(lhs.begin(), lhs.end());
+        return equals(lhs_v, rhs);
+    }
+
+    template <>
+    bool operator()(const V& lhs, const S& rhs)
+    {
+        return equals(rhs, lhs);
+    }
+
+};
+
 
 #include "graphutils.hpp"
 
