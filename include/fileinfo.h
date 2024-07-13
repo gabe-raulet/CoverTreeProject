@@ -28,7 +28,7 @@ struct FileInfo
 
     const char* get_file_size_str()
     {
-        if (fsize_str.size() == 0)
+        if (fsize_str.empty())
         {
             /*
              * The following code was copied/adapted from here: 'https://en.cppreference.com/w/cpp/filesystem/file_size'
