@@ -25,7 +25,6 @@ using Graph = vector<unordered_set<Index>>;
 enum Indexer {BruteOpt, TreeOpt};
 
 void read_options(int argc, char *argv[], char *&infname, char *&outfname, double& radius, double& base, Indexer& indexer);
-void write_graph_file(const Graph& graph, const char *fname);
 
 template <class Kind>
 void build_point_index(PointIndex<Kind>& ptidx, const vector<Point>& points);
@@ -59,7 +58,7 @@ int main(int argc, char *argv[])
     if (indexer == TreeOpt) build_rgraph(ti, radius, graph);
     else build_rgraph(bf, radius, graph);
 
-    write_graph_file(graph, outfname);
+    GraphUtils<Index>::write_graph_file(graph, outfname, true);
 
     timer.stop_timer();
     main_msg(argc, argv, timer.get_elapsed());
@@ -130,9 +129,4 @@ void build_rgraph(PointIndex<Kind>& ptidx, double radius, Graph& graph)
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: built %.3f-graph [num_verts=%lu,num_edges=%lu,avg_deg=%.3f]\n", timer.get_elapsed(), __func__, radius, graph.size(), static_cast<size_t>(num_edges), (num_edges+0.0)/graph.size());
-}
-
-void write_graph_file(const Graph& graph, const char *fname)
-{
-    GraphUtils<Index>::write_graph_file(graph, fname, true);
 }

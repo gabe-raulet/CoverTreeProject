@@ -5,6 +5,7 @@
 #include "ptidx.h"
 #include "ptraits.h"
 #include "ptutils.h"
+#include "graphutils.h"
 #include "timer.h"
 #include "misc.h"
 
@@ -54,9 +55,9 @@ int main(int argc, char *argv[])
 
     PointUtils<PointTraits, Index>::read_points_file(points, fname);
 
-    build_point_index(bf, points);
+    /* build_point_index(bf, points); */
     /* build_point_index(pf, points); */
-    /* build_point_index(tf, points); */
+    build_point_index(tf, points);
 
 
     double radius = cutoff;
@@ -64,11 +65,11 @@ int main(int argc, char *argv[])
     {
         IndexSetVector g1, g2, g3;
 
-        build_rgraph(bf, radius, g1, iter);
+        /* build_rgraph(bf, radius, g1, iter); */
         /* build_rgraph(pf, radius, g2, iter); */
-        /* build_rgraph(tf, radius, g3, iter); */
+        build_rgraph(tf, radius, g3, iter);
 
-        graphs.push_back(g1);
+        graphs.push_back(g3);
         radius *= damping;
     }
 
@@ -147,35 +148,9 @@ void build_rgraph(PointIndex<Kind>& ptidx, double radius, IndexSetVector& rgraph
 
 void write_rgraph_file(const IndexSetVector& rgraph, const char *oprefix, int iter)
 {
-    LocalTimer timer;
-    timer.start_timer();
-
     stringstream ss;
     ss << oprefix << "_" << iter << ".rgraph";
     string fname = ss.str();
 
-    ss.clear();
-    ss.str({});
-
-    Index num_edges = 0;
-
-    for (Index u = 0; const auto& neighs : rgraph)
-    {
-        num_edges += neighs.size();
-
-        for (Index v : neighs)
-            ss << u+1 << " " << v+1 << "\n";
-    }
-
-    ofstream os;
-    os.open(fname, ios::out);
-
-    os << rgraph.size() << " " << num_edges << "\n";
-    os << ss.str();
-
-    os.close();
-
-    timer.stop_timer();
-
-    fprintf(stderr, "[time=%.3f,msg::%s] :: wrote file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname.c_str(), FileInfo(fname).get_file_size_str());
+    GraphUtils<Index>::write_graph_file(rgraph, fname.c_str(), true);
 }
