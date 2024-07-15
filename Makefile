@@ -12,7 +12,7 @@ FLAGS+=-O2
 endif
 
 all: create_points point_info graph_diff build_rgraph
-test: test_itree test_vcell test_graphutils test_ptidx test_pts
+test: test_itree test_ctree test_vcell test_graphutils test_ptidx test_pts
 
 create_points: src/create_points.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
@@ -29,6 +29,9 @@ build_rgraph: src/build_rgraph.cpp include
 test_itree: tests/test_itree.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
+test_ctree: tests/test_ctree.cpp include
+	$(CXX) -o $@ $(FLAGS) $(INCS) $<
+
 test_vcell: tests/test_vcell.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
@@ -42,4 +45,4 @@ test_graphutils: tests/test_graphutils.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 clean:
-	rm -rf *.dSYM test_itree test_vcell test_graphutils test_ptidx test_pts create_points point_info graph_diff build_rgraph
+	rm -rf *.dSYM test_itree test_ctree test_vcell test_graphutils test_ptidx test_pts create_points point_info graph_diff build_rgraph
