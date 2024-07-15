@@ -78,29 +78,3 @@ void read_options(int argc, char *argv[], Index& n, char *&fname, double& var, i
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: [n=%lu,fname='%s',var=%.2f,seed=%d]\n", timer.get_elapsed(), __func__, static_cast<size_t>(n), fname, var, seed);
 }
-
-/*
- * void generate_points(vector<Point>& points, Index totsize, double var, int seed)
- * {
- *     LocalTimer timer;
- *     timer.start_timer();
- *
- *     PointGen ptgen(seed);
- *     ptgen.generate_points(points, totsize, var);
- *
- *     timer.stop_timer();
- *     fprintf(stderr, "[time=%.3f,msg::%s] :: generated %lu points\n", timer.get_elapsed(), __func__, static_cast<size_t>(totsize));
- * }
- *
- * void write_points_file(const vector<Point>& points, const char *fname)
- * {
- *     LocalTimer timer;
- *     timer.start_timer();
- *
- *     PointTraits::write_to_file(points.cbegin(), points.cend(), fname);
- *
- *     timer.stop_timer();
- *
- *     fprintf(stderr, "[time=%.3f,msg::%s] :: wrote points to file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname, FileInfo(fname).get_file_size_str());
- * }
- */
