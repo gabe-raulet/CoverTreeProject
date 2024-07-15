@@ -11,7 +11,14 @@ void test_ctree(Index n, Real var, Real cutoff, Real damping, int iters, bool ve
 
 int main(int argc, char *argv[])
 {
-    test_ctree<int64_t, float, 8>(100000, 10.0, 10.0, 0.9, 25, true);
+    LocalTimer timer;
+    timer.start_timer();
+
+    test_ctree<int64_t, float, 3>(20000, 10.0, 1.0, 0.9, 25, true);
+
+    timer.stop_timer();
+
+    fprintf(stderr, "[time=%.3f, msg::%s] :: command: %s\n", timer.get_elapsed(), __func__, argv[0]);
 
     return 0;
 }
