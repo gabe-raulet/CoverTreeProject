@@ -34,8 +34,11 @@ class CoverTree
         template <class Iter>
         void build(Iter first, Iter last, Real base);
 
-        Index radii_query(const Point& query, Real radius, IndexSet& ids) const;
-        Index radii_query(const Index& query, Real radius, IndexSet& ids) const { return radii_query(points[query], radius, ids); }
+        template <class IndexContainer>
+        Index radii_query(const Point& query, Real radius, IndexContainer& ids) const;
+
+        template <class IndexContainer>
+        Index radii_query(const Index& query, Real radius, IndexContainer& ids) const { return radii_query(points[query], radius, ids); }
 
         Index size() const { return points.size(); }
         Real get_max_radius() const { return max_radius; }

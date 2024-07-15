@@ -5,6 +5,9 @@ test_itree
 test_vcell
 test_indexers
 test_graphutils
+test_pts
+test_ptidx
+test_ctree
 create_points
 point_info
 graph_diff

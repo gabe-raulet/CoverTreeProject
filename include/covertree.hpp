@@ -8,18 +8,21 @@ void CoverTree<PointTraits, Index>::build(Iter first, Iter last, Real _base)
 }
 
 template <class PointTraits, class Index>
-Index CoverTree<PointTraits, Index>::radii_query(const Point& query, Real radius, IndexSet& ids) const
+template <class IndexContainer>
+Index CoverTree<PointTraits, Index>::radii_query(const Point& query, Real radius, IndexContainer& ids) const
 {
     ids.clear();
     IndexVector stack = {0}, children;
     auto distance = PointTraits::distance();
+
+    IndexSet ids_;
 
     while (!stack.empty())
     {
         Index u = stack.back(); stack.pop_back();
 
         if (distance(query, points[tree.get_item(u)]) <= radius)
-            ids.insert(tree.get_item(u));
+            ids_.insert(tree.get_item(u));
 
         tree.get_children(u, children);
 
@@ -27,6 +30,9 @@ Index CoverTree<PointTraits, Index>::radii_query(const Point& query, Real radius
             if (distance(query, points[tree.get_item(v)]) <= radius + max_radius * level_radius(tree.get_level(v)))
                 stack.push_back(v);
     }
+
+    if constexpr (same_as<IndexContainer, IndexSet>) ids = ::move(ids_);
+    else ids.assign(ids_.begin(), ids_.end());
 
     return ids.size();
 }

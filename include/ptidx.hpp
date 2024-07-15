@@ -85,3 +85,47 @@ BruteForcer<PointTraits_, Index_>::build_rgraph(Real radius, Graph& g) const
 
     return m;
 }
+
+template <class PointTraits_, class Index_>
+TreeIndexer<PointTraits_, Index_>::TreeIndexer()
+    : TreeIndexer(2.0, numeric_limits<Real>::max()) {}
+
+template <class PointTraits_, class Index_>
+TreeIndexer<PointTraits_, Index_>::TreeIndexer(Real base)
+    : TreeIndexer(base, numeric_limits<Real>::max()) {}
+
+template <class PointTraits_, class Index_>
+TreeIndexer<PointTraits_, Index_>::TreeIndexer(Real base, Real cutoff)
+    : base(base), cutoff(cutoff) {}
+
+template <class PointTraits_, class Index_>
+template <class Iter>
+void TreeIndexer<PointTraits_, Index_>::build(Iter first, Iter last)
+{
+    tree.build(first, last, base);
+}
+
+template <class PointTraits_, class Index_>
+template <class Container>
+void TreeIndexer<PointTraits_, Index_>::radii_query(Index id, Real radius, Container& ids) const
+{
+    tree.radii_query(id, radius, ids);
+}
+
+template <class PointTraits_, class Index_>
+template <class Graph>
+typename TreeIndexer<PointTraits_, Index_>::Index
+TreeIndexer<PointTraits_, Index_>::build_rgraph(Real radius, Graph& g) const
+{
+    g.clear();
+    Index m = 0;
+
+    for (Index i = 0; i < size(); ++i)
+    {
+        g.emplace_back();
+        tree.radii_query(i, radius, g.back());
+        m += g.back().size();
+    }
+
+    return m;
+}

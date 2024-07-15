@@ -75,6 +75,6 @@ double PointUtils<PointTraits_, Index_>::build_rgraph(PointIndex<Kind>& ptidx, R
     timer.stop_timer();
     elapsed = timer.get_elapsed();
 
-    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: built %.3f-graph :: [verts=%lu,edges=%lu,meandeg=%.3f]\n", elapsed, __func__, radius, g.size(), m, (m+0.0)/(g.size()+0.0));
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: built %.3f-graph :: [indexer=%s,verts=%lu,edges=%lu,meandeg=%.3f]\n", elapsed, __func__, radius, ptidx.repr(), g.size(), m, (m+0.0)/(g.size()+0.0));
     return elapsed;
 }
