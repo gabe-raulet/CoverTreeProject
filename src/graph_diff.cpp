@@ -7,9 +7,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    using Index = int64_t;
-    using GraphUtils = GraphUtils<Index>;
-    using Graph = GraphUtils::VecGraph;
+    using GraphUtils = GraphUtils<>;
+    using Index = GraphUtils::Index;
+    using Graph = GraphUtils::GraphV;
 
     LocalTimer timer;
     timer.start_timer();
@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
 
     Graph g1, g2;
 
-    GraphUtils::read_graph_file(g1, argv[1]);
-    GraphUtils::read_graph_file(g2, argv[2]);
+    GraphUtils::read_graph_file(g1, argv[1], true);
+    GraphUtils::read_graph_file(g2, argv[2], true);
 
-    GraphUtils::compare_graphs(g1, g2);
+    GraphUtils::compare_graphs(g1, g2, true);
 
     timer.stop_timer();
 

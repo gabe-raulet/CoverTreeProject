@@ -1,89 +1,87 @@
-template <class PointTraits, class Index>
-struct GraphInserter
+template <class PointTraits_, class Index_, class Kind>
+typename PointIndexer<PointTraits_, Index_, Kind>::Index
+PointIndexer<PointTraits_, Index_, Kind>::size() const
 {
-    using Real = typename PointTraits::Real;
-    using Point = typename PointTraits::Point;
-    using PointVector = vector<Point>;
-
-    template <class NeighborContainer>
-    Index operator()(const PointVector& points, Real radius, vector<NeighborContainer>& graph) const
-    {
-        graph.clear();
-        auto distance = PointTraits::distance();
-        Index num_edges = 0;
-
-        for (Index i = 0; i < points.size(); ++i)
-        {
-            graph.emplace_back();
-            auto& neighs = graph.back();
-            auto it = inserter(neighs, neighs.end());
-
-            for (Index j = 0; j < points.size(); ++j)
-                if (distance(points[i], points[j]) <= radius)
-                    *it++ = j;
-
-            num_edges += neighs.size();
-        }
-
-        return num_edges;
-    }
-};
-
-template <class PointTraits, class Index>
-Index BruteForcer<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector& graph) const
-{
-    return GraphInserter<PointTraits, Index>()(points, radius, graph);
+    return static_cast<const Kind&>(*this).size();
 }
 
-template <class PointTraits, class Index>
-template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
-void PrunedForcer<PointTraits, Index>::build(Iter first, Iter last)
+template <class PointTraits_, class Index_, class Kind>
+template <class Iter>
+void PointIndexer<PointTraits_, Index_, Kind>::build(Iter first, Iter last)
+{
+    return static_cast<Kind&>(*this).build(first, last);
+}
+
+template <class PointTraits_, class Index_, class Kind>
+template <class Container>
+void PointIndexer<PointTraits_, Index_, Kind>::radii_query(Index id, Real radius, Container& ids) const
+{
+    return static_cast<const Kind&>(*this).radii_query(id, radius, ids);
+}
+
+template <class PointTraits_, class Index_, class Kind>
+template <class Graph>
+typename PointIndexer<PointTraits_, Index_, Kind>::Index
+PointIndexer<PointTraits_, Index_, Kind>::build_rgraph(Real radius, Graph& g) const
+{
+    return static_cast<const Kind&>(*this).build_rgraph(radius, g);
+}
+
+template <class PointTraits_, class Index_, class Kind>
+const char* PointIndexer<PointTraits_, Index_, Kind>::repr() const
+{
+    return static_cast<const Kind&>(*this).repr();
+}
+
+template <class PointTraits_, class Index_>
+template <class Iter>
+void BruteForcer<PointTraits_, Index_>::build(Iter first, Iter last)
 {
     points.assign(first, last);
-    GraphInserter<PointTraits, Index>()(points, cutoff, cutoff_neighs);
-}
 
-template <class PointTraits, class Index>
-Index PrunedForcer<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector& graph) const
-{
-    graph.clear();
+    cutoff_neighs.clear();
     auto distance = PointTraits::distance();
-    Index num_edges = 0;
 
     for (Index i = 0; i < size(); ++i)
     {
-        graph.emplace_back();
-        auto& neighs = graph.back();
+        cutoff_neighs.emplace_back();
+        auto& neighs = cutoff_neighs.back();
+        auto it = inserter(neighs, neighs.end());
 
-        for (Index j : cutoff_neighs[i])
-            if (distance(points[i], points[j]) <= radius)
-                neighs.insert(j);
-
-        num_edges += neighs.size();
+        for (Index j = 0; j < size(); ++j)
+            if (distance(points[i], points[j]) <= cutoff)
+                *it++ = j;
     }
-
-    return num_edges;
 }
 
-template <class PointTraits, class Index>
-template <class Iter> requires is_iter_type<Iter, typename PointTraits::Point>
-void CoverTreeIndex<PointTraits, Index>::build(Iter first, Iter last)
+template <class PointTraits_, class Index_>
+template <class Container>
+void BruteForcer<PointTraits_, Index_>::radii_query(Index id, Real radius, Container& ids) const
 {
-    covertree.build(first, last, base);
+    ids.clear();
+
+    auto it = inserter(ids, ids.end());
+    auto distance = PointTraits::distance();
+
+    for (Index i : cutoff_neighs[id])
+        if (distance(points[id], points[i]) <= radius)
+            *it++ = i;
 }
 
-template <class PointTraits, class Index>
-Index CoverTreeIndex<PointTraits, Index>::build_rgraph(Real radius, IndexSetVector& graph) const
+template <class PointTraits_, class Index_>
+template <class Graph>
+typename BruteForcer<PointTraits_, Index_>::Index
+BruteForcer<PointTraits_, Index_>::build_rgraph(Real radius, Graph& g) const
 {
-    graph.clear();
-    Index num_edges = 0;
+    g.clear();
+    Index m = 0;
 
     for (Index i = 0; i < size(); ++i)
     {
-        graph.emplace_back();
-        auto& neighs = graph.back();
-        num_edges += covertree.radii_query(i, radius, neighs);
+        g.emplace_back();
+        radii_query(i, radius, g.back());
+        m += g.back().size();
     }
 
-    return num_edges;
+    return m;
 }

@@ -11,13 +11,10 @@ else
 FLAGS+=-O2
 endif
 
-all: create_points point_info pindex_graph graph_diff build_rgraph erdos_renyi
-test: test_itree test_vcell test_indexers test_graphutils
+all: create_points point_info graph_diff build_rgraph
+test: test_itree test_vcell test_graphutils test_ptidx test_pts
 
 create_points: src/create_points.cpp include
-	$(CXX) -o $@ $(FLAGS) $(INCS) $<
-
-pindex_graph: src/pindex_graph.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 graph_diff: src/graph_diff.cpp include
@@ -29,20 +26,20 @@ point_info: src/point_info.cpp include
 build_rgraph: src/build_rgraph.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
-erdos_renyi: src/erdos_renyi.cpp include
-	$(CXX) -o $@ $(FLAGS) $(INCS) $<
-
 test_itree: tests/test_itree.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 test_vcell: tests/test_vcell.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
-test_indexers: tests/test_indexers.cpp include
+test_ptidx: tests/test_ptidx.cpp include
+	$(CXX) -o $@ $(FLAGS) $(INCS) $<
+
+test_pts: tests/test_pts.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 test_graphutils: tests/test_graphutils.cpp include
 	$(CXX) -o $@ $(FLAGS) $(INCS) $<
 
 clean:
-	rm -rf *.dSYM test_itree test_vcell test_indexers test_graphutils create_points point_info pindex_graph graph_diff build_rgraph erdos_renyi
+	rm -rf *.dSYM test_itree test_vcell test_graphutils test_ptidx test_pts create_points point_info graph_diff build_rgraph

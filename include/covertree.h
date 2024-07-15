@@ -10,10 +10,13 @@
 
 using namespace std;
 
-template <class PointTraits, class Index>
+template <class PointTraits_, class Index_>
 class CoverTree
 {
     public:
+
+        using PointTraits = PointTraits_;
+        using Index = Index_;
 
         using Real = typename PointTraits::Real;
         using Point = typename PointTraits::Point;

@@ -7,7 +7,5 @@ test_indexers
 test_graphutils
 create_points
 point_info
-pindex_graph
 graph_diff
 build_rgraph
-erdos_renyi

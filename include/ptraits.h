@@ -3,32 +3,51 @@
 
 #include <fstream>
 #include <sstream>
-#include <assert.h>
-#include "misc.h"
+#include <unordered_set>
+#include <random>
 #include "fileinfo.h"
+#include "timer.h"
 
 using namespace std;
 
-template <class R>
-concept float_type = same_as<R, float> || same_as<R, double>;
+/*
+ * Euclidean metric space.
+ */
+
+template <class Real>
+concept real_type = same_as<Real, float> || same_as<Real, double>;
 
 template <int D>
 concept is_pos_int = (D >= 1);
 
-template <class R, int D>
-struct point_type { using Point = array<R, D>; };
-
-template <class R>
-struct point_type<R, 1> { using Point = R; };
-
-template <float_type R, int D> requires is_pos_int<D>
-struct Traits
+template <real_type Real, int D> requires is_pos_int<D>
+struct real_point_type
 {
-    using Real = R;
-    using Point = typename point_type<Real, D>::Point;
+    using Point = array<Real, D>;
+};
+
+template <real_type Real>
+struct real_point_type<Real, 1>
+{
+    using Point = Real;
+};
+
+template <real_type Real_, int D> requires is_pos_int<D>
+struct EuclideanTraits
+{
+    using Real = Real_;
+
+    using Point = typename real_point_type<Real, D>::Point;
     using PointRecord = array<char, sizeof(int) + sizeof(Point)>;
 
-    struct Distance { R operator()(const Point& p, const Point& q); };
+    using RealVector = vector<Real>;
+    using PointVector = vector<Point>;
+
+    struct Distance
+    {
+        Real operator()(const Point& p, const Point& q);
+    };
+
     static Distance distance() { return Distance(); }
     static consteval int dimension() { return D; }
 
@@ -42,15 +61,18 @@ struct Traits
     static void write_to_file(Iter first, Iter last, const char *fname);
 
     template <class RandomGen, class RandomDist>
-    static void fill_random_point(Point& point, RandomGen& gen, RandomDist& dist);
+    static void fill_random_point(Point& p, RandomGen& gen, RandomDist& dist);
 
     template <class Iter, class RandomGen, class RandomDist>
     static void fill_random_points(Iter first, Iter last, RandomGen& gen, RandomDist& dist);
 
-    static string info();
-    static string repr(const Point& point, int precision=3);
+    template <class Index>
+    static double generate_random_gaussian(PointVector& points, Index size, Real var, int seed, bool verbose = false);
 
+    static string repr(const Point& p, int precision=3);
     struct PointHash { size_t operator()(const Point& p) const noexcept; };
+
+    using PointSet = unordered_set<Point, PointHash>;
 };
 
 template <int FP>
@@ -77,7 +99,7 @@ struct select_dim<DIM>
 template <int FP, int DIM>
 struct SelectPoint
 {
-    using PointTraits = Traits<typename select_real<FP>::Real, select_dim<DIM>::dim()>;
+    using PointTraits = EuclideanTraits<typename select_real<FP>::Real, select_dim<DIM>::dim()>;
 };
 
 #include "ptraits.hpp"

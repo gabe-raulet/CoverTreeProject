@@ -13,15 +13,9 @@ struct LocalTimer
 
     time_point start, end;
 
-    static double time_between(const time_point& start, const time_point& end)
-    {
-        return duration(end - start).count();
-    }
-
     void start_timer() { start = clock::now(); }
     void stop_timer()  { end = clock::now(); }
-
-    double get_elapsed() { return time_between(start, end); }
+    double get_elapsed() { return duration(end - start).count(); }
 };
 
 #endif

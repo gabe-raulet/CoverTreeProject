@@ -9,54 +9,47 @@
 #include "timer.h"
 #include "misc.h"
 
-using Index = int64_t;
-using PointTraits = SelectPoint<FPSIZE, PTDIM>::PointTraits;
-
-template <class Kind>
-using PointIndex = PointIndexer<PointTraits, Index, Kind>;
-
-using BruteForce = BruteForcer<PointTraits, Index>;
-using TreeIndex = CoverTreeIndex<PointTraits, Index>;
-
-using Real = PointTraits::Real;
-using Point = PointTraits::Point;
-using Graph = vector<unordered_set<Index>>;
+using namespace std;
 
 enum Indexer {BruteOpt, TreeOpt};
 
-void read_options(int argc, char *argv[], char *&infname, char *&outfname, double& radius, double& base, Indexer& indexer);
-
-template <class Kind>
-void build_point_index(PointIndex<Kind>& ptidx, const vector<Point>& points);
-
-template <class Kind>
-void build_rgraph(PointIndex<Kind>& ptidx, double radius, Graph& graph);
+template <class Real>
+void read_options(int argc, char *argv[], char *&infname, char *&outfname, Real& radius, Real& base, Indexer& indexer);
 
 int main(int argc, char *argv[])
 {
-    double radius, base = 2.0;
+    using PointTraits = SelectPoint<FPSIZE, PTDIM>::PointTraits;
+    using PointUtils = PointUtils<PointTraits>;
+
+    using Index = PointUtils::Index;
+    using Real = PointTraits::Real;
+    using Point = PointTraits::Point;
+    using PointVector = PointTraits::PointVector;
+    using Graph = GraphUtils<Index>::GraphV;
+
+    using BruteForce = BruteForcer<PointTraits, Index>;
+
+    Real radius, base = 2.0;
     char *infname, *outfname;
     Indexer indexer = TreeOpt;
 
     LocalTimer timer;
     timer.start_timer();
 
-    vector<Point> points;
+    PointVector points;
 
     read_options(argc, argv, infname, outfname, radius, base, indexer);
 
-    PointUtils<PointTraits, Index>::read_points_file(points, infname);
+    PointUtils::read_points_file(points, infname);
 
     BruteForce bf;
-    TreeIndex ti(base);
 
-    if (indexer == TreeOpt) build_point_index(ti, points);
-    else build_point_index(bf, points);
+    if (indexer == TreeOpt) PointUtils::build_point_index(bf, points, true);
+    else PointUtils::build_point_index(bf, points, true);
 
     Graph graph;
 
-    if (indexer == TreeOpt) build_rgraph(ti, radius, graph);
-    else build_rgraph(bf, radius, graph);
+    PointUtils::build_rgraph(bf, radius, graph, true);
 
     GraphUtils<Index>::write_graph_file(graph, outfname, true);
 
@@ -66,7 +59,8 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void read_options(int argc, char *argv[], char *&infname, char *&outfname, double& radius, double& base, Indexer& indexer)
+template <class Real>
+void read_options(int argc, char *argv[], char *&infname, char *&outfname, Real& radius, Real& base, Indexer& indexer)
 {
     LocalTimer timer;
     timer.start_timer();
@@ -103,30 +97,4 @@ void read_options(int argc, char *argv[], char *&infname, char *&outfname, doubl
     timer.stop_timer();
 
     fprintf(stderr, "[time=%.3f,msg::%s] :: [ptsfname='%s',graphfname='%s',radius=%.2f,indexer=%s]\n", timer.get_elapsed(), __func__, infname, outfname, radius, indexer == BruteOpt? "brute_force" : "cover_tree");
-}
-
-template <class Kind>
-void build_point_index(PointIndex<Kind>& ptidx, const vector<Point>& points)
-{
-    LocalTimer timer;
-    timer.start_timer();
-
-    ptidx.build(points.begin(), points.end());
-
-    timer.stop_timer();
-
-    fprintf(stderr, "[time=%.3f,msg::%s] :: built index using %s indexer\n", timer.get_elapsed(), __func__, ptidx.repr());
-}
-
-template <class Kind>
-void build_rgraph(PointIndex<Kind>& ptidx, double radius, Graph& graph)
-{
-    LocalTimer timer;
-    timer.start_timer();
-
-    Index num_edges = ptidx.build_rgraph(static_cast<Real>(radius), graph);
-
-    timer.stop_timer();
-
-    fprintf(stderr, "[time=%.3f,msg::%s] :: built %.3f-graph [num_verts=%lu,num_edges=%lu,avg_deg=%.3f]\n", timer.get_elapsed(), __func__, radius, graph.size(), static_cast<size_t>(num_edges), (num_edges+0.0)/graph.size());
 }

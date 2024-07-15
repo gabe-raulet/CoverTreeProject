@@ -1,25 +1,18 @@
-template <class Index>
+template <class Index_>
 template <class Graph>
-Index GraphUtils<Index>::num_edges(const Graph& g)
+typename GraphUtils<Index_>::Index
+GraphUtils<Index_>::num_edges(const Graph& g)
 {
     Index m = 0;
     for_each(g.begin(), g.end(), [&m](const auto& es) { m += es.size(); });
     return m;
 }
 
-template <class Index>
-template <class Graph, class Real>
-void GraphUtils<Index>::get_info(const Graph& g, Index& verts, Index& edges, Real& avg_deg)
-{
-    verts = g.size();
-    edges = num_edges(g);
-    avg_deg = (edges+0.0)/(verts+0.0);
-}
-
-template <class Index>
+template <class Index_>
 template <class Graph>
-Index GraphUtils<Index>::read_graph_file(Graph& g, const char *fname, bool verbose)
+double GraphUtils<Index_>::read_graph_file(Graph& g, const char *fname, bool verbose)
 {
+    double elapsed;
     LocalTimer timer;
     timer.start_timer();
 
@@ -30,30 +23,32 @@ Index GraphUtils<Index>::read_graph_file(Graph& g, const char *fname, bool verbo
     is.open(fname);
     getline(is, line);
     istringstream(line) >> n >> m;
-
     g.clear(), g.resize(n);
 
+    m = 0;
     while (getline(is, line))
     {
         istringstream(line) >> u >> v;
         auto& es = g[u-1];
         es.insert(es.end(), v-1);
+        m++;
     }
 
     is.close();
+
     timer.stop_timer();
+    elapsed = timer.get_elapsed();
 
-    m = num_edges(g);
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: read graph file '%s' :: [verts=%lu,edges=%lu,meandeg=%.3f,filesize=%s]\n", elapsed, __func__, fname, (size_t)n, (size_t)m, (m+0.0)/(n+0.0), FileInfo(fname).get_file_size_str());
 
-    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] read file '%s' [num_verts=%lu,num_edges=%lu,filesize=%s]\n", timer.get_elapsed(), __func__, fname, (size_t)n, (size_t)m, FileInfo(fname).get_file_size_str());
-
-    return m;
+    return elapsed;
 }
 
-template <class Index>
+template <class Index_>
 template <class Graph>
-void GraphUtils<Index>::write_graph_file(const Graph& g, const char *fname, bool verbose)
+double GraphUtils<Index_>::write_graph_file(const Graph& g, const char *fname, bool verbose)
 {
+    double elapsed;
     LocalTimer timer;
     timer.start_timer();
 
@@ -69,19 +64,22 @@ void GraphUtils<Index>::write_graph_file(const Graph& g, const char *fname, bool
     {
         for (Index v : neighs)
             os << u+1 << " " << v+1 << "\n";
-
         u++;
     }
 
     os.close();
-    timer.stop_timer();
 
-    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: wrote file '%s' [filesize=%s]\n", timer.get_elapsed(), __func__, fname, FileInfo(fname).get_file_size_str());
+    timer.stop_timer();
+    elapsed = timer.get_elapsed();
+
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: wrote graph file '%s' :: [verts=%lu,edges=%lu,meandeg=%.3f,filesize=%s]\n", elapsed, __func__, fname, (size_t)n, (size_t)m, (m+0.0)/(n+0.0), FileInfo(fname).get_file_size_str());
+
+    return elapsed;
 }
 
-template <class Index>
+template <class Index_>
 template <class Graph1, class Graph2>
-bool GraphUtils<Index>::compare_graphs(const Graph1& g1, const Graph2& g2, bool verbose)
+bool GraphUtils<Index_>::compare_graphs(const Graph1& g1, const Graph2& g2, bool verbose)
 {
     LocalTimer timer;
     timer.start_timer();
@@ -94,7 +92,7 @@ bool GraphUtils<Index>::compare_graphs(const Graph1& g1, const Graph2& g2, bool 
     if (n1 != n2)
     {
         timer.stop_timer();
-        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [n1=%lu,n2=%lu]\n", timer.get_elapsed(), __func__, n1, n2);
+        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: graphs differ :: [n1=%lu,n2=%lu]\n", timer.get_elapsed(), __func__, n1, n2);
         return false;
     }
 
@@ -104,40 +102,54 @@ bool GraphUtils<Index>::compare_graphs(const Graph1& g1, const Graph2& g2, bool 
     if (m1 != m2)
     {
         timer.stop_timer();
-        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [m1=%lu,m2=%lu]\n", timer.get_elapsed(), __func__, m1, m2);
+        if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: graphs differ :: [m1=%lu,m2=%lu]\n", timer.get_elapsed(), __func__, m1, m2);
         return false;
     }
 
-    auto comp = CompareEdgeSet<Index>();
+    timer.stop_timer();
 
-    for (Index i = 0; i < n1; ++i)
-        if (!comp(g1[i], g2[i]))
+    bool correct = true;
+
+    for (size_t i = 0; i < n1; ++i)
+    {
+        if constexpr (same_as<Graph1, GraphV> && same_as<Graph2, GraphV>)
+        {
+            correct = is_permutation(g1[i].begin(), g1[i].end(), g2[i].begin());
+        }
+        else if constexpr (same_as<Graph1, GraphV> && same_as<Graph2, GraphS>)
+        {
+            IndexSet tmp(g1[i].begin(), g1[i].end());
+            correct = (tmp == g2[i]);
+        }
+        else if constexpr (same_as<Graph1, GraphS> && same_as<Graph2, GraphV>)
+        {
+            IndexSet tmp(g2[i].begin(), g2[i].end());
+            correct = (tmp == g1[i]);
+        }
+        else correct = (g1[i] == g2[i]);
+
+        if (!correct)
         {
             timer.stop_timer();
-            if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs differ [g1[%lu]!=g2[%lu]]\n", timer.get_elapsed(), __func__, (size_t)(i+1), (size_t)(i+1));
+            if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: graphs differ :: [g1[%lu]!=g2[%lu]]\n", timer.get_elapsed(), __func__, i+1, i+1);
             return false;
         }
+    }
 
     timer.stop_timer();
-    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] graphs identical\n", timer.get_elapsed(), __func__);
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: graphs identical\n", timer.get_elapsed(), __func__);
     return true;
 }
 
-template <class Index>
-template <class Graph, class Real>
-Index GraphUtils<Index>::erdos_renyi(Graph& g, Index n, Real p, int seed)
-{
-    random_device rd;
-    default_random_engine gen(seed < 0? rd() : seed*17);
-    return erdos_renyi(g, n, p, gen);
-}
-
-template <class Index>
+template <class Index_>
 template <class Graph, class Real, class RandomGen>
-Index GraphUtils<Index>::erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen)
+double GraphUtils<Index_>::erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen, bool verbose)
 {
-    g.clear();
+    double elapsed;
+    LocalTimer timer;
+    timer.start_timer();
 
+    g.clear();
     Index m = 0;
     vector<bool> bits(n);
     uniform_real_distribution<Real> dist{0.0, 1.0};
@@ -156,26 +168,17 @@ Index GraphUtils<Index>::erdos_renyi(Graph& g, Index n, Real p, RandomGen& gen)
         m += dest.size();
     }
 
-    return m;
+    timer.stop_timer();
+    elapsed = timer.get_elapsed();
+
+    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: generated G(%lu,%.2f)-graph :: [verts=%lu,edges=%lu,meandeg=%.3f]\n", elapsed, __func__, (size_t)n, p, (size_t)n, (size_t)m, (m+0.0)/(n+0.0));
+    return elapsed;
 }
 
-template <class Index>
-void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, int seed, bool verbose)
+template <class Index_>
+void GraphUtils<Index_>::shuffle_vector_graph(GraphV& g, int seed)
 {
     random_device rd;
     default_random_engine gen(seed < 0? rd() : seed*17);
-    shuffle_vector_graph(g, gen, verbose);
-}
-
-template <class Index>
-template <class RandomGen>
-void GraphUtils<Index>::shuffle_vector_graph(VecGraph& g, RandomGen& gen, bool verbose)
-{
-    LocalTimer timer;
-
-    timer.start_timer();
     for (auto& es : g) shuffle(es.begin(), es.end(), gen);
-    timer.stop_timer();
-
-    if (verbose) fprintf(stderr, "[time=%.3f,msg::%s] :: shuffled graph\n", timer.get_elapsed(), __func__);
 }
